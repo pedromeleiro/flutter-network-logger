@@ -268,17 +268,14 @@ class NetworkLoggerScreen extends StatelessWidget {
     );
   }
 
-  final TextEditingController searchController =
-      TextEditingController(text: null);
+  final TextEditingController searchController = TextEditingController(text: null);
 
   /// filte events with search keyword
   List<NetworkEvent> getEvents() {
     if (searchController.text.isEmpty) return eventList.events;
 
     final query = searchController.text.toLowerCase();
-    return eventList.events
-        .where((it) => it.request?.uri.toLowerCase().contains(query) ?? false)
-        .toList();
+    return eventList.events.where((it) => it.request?.uri.toLowerCase().contains(query) ?? false).toList();
   }
 
   @override
@@ -310,13 +307,11 @@ class NetworkLoggerScreen extends StatelessWidget {
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: const Icon(Icons.search, color: Colors.black26),
+                  prefixIcon: const Icon(Icons.search),
                   suffix: ValueListenableBuilder<TextEditingValue>(
                     valueListenable: searchController,
-                    builder: (context, value, child) => value.text.isNotEmpty
-                        ? Text(getEvents().length.toString() + ' results')
-                        : const SizedBox(),
+                    builder: (context, value, child) =>
+                        value.text.isNotEmpty ? Text(getEvents().length.toString() + ' results') : const SizedBox(),
                   ),
                   hintText: "enter keyword to search",
                 ),
@@ -328,27 +323,24 @@ class NetworkLoggerScreen extends StatelessWidget {
                     events,
                     (context, item) => ListTile(
                       key: ValueKey(item.request),
-                      title: Text(
-                        item.request!.method,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        item.request!.uri.toString(),
-                        maxLines: 1,
+                      subtitle: RichText(
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: item.request!.method,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            WidgetSpan(child: SizedBox(width: 6)),
+                            TextSpan(
+                              text: item.request!.uri,
+                            ),
+                          ],
+                        ),
                       ),
-                      leading: Icon(
-                        item.error == null
-                            ? (item.response == null
-                                ? Icons.hourglass_empty
-                                : Icons.done)
-                            : Icons.error,
-                      ),
-                      trailing: _AutoUpdate(
-                        duration: Duration(seconds: 1),
-                        builder: (context) =>
-                            Text(_timeDifference(item.timestamp!)),
-                      ),
+                      trailing: Text(
+                          "${item.timestamp!.hour.toString().padLeft(2, "0")}:${item.timestamp!.minute.toString().padLeft(2, "0")}:${item.timestamp!.second.toString().padLeft(2, "0")}.${item.timestamp!.millisecond.toString().padLeft(3, "0")}"),
                       onTap: () => NetworkLoggerEventScreen.open(
                         context,
                         item,
@@ -382,8 +374,7 @@ final _jsonEncoder = JsonEncoder.withIndent('  ');
 
 /// Screen that displays log entry details.
 class NetworkLoggerEventScreen extends StatelessWidget {
-  const NetworkLoggerEventScreen({Key? key, required this.event})
-      : super(key: key);
+  const NetworkLoggerEventScreen({Key? key, required this.event}) : super(key: key);
 
   static Route<void> route({
     required NetworkEvent event,
@@ -497,8 +488,7 @@ class NetworkLoggerEventScreen extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
-          child:
-              Text('TIMESTAMP', style: Theme.of(context).textTheme.bodySmall),
+          child: Text('TIMESTAMP', style: Theme.of(context).textTheme.bodySmall),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -507,8 +497,7 @@ class NetworkLoggerEventScreen extends StatelessWidget {
         if (event.request!.headers.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
-            child:
-                Text('HEADERS', style: Theme.of(context).textTheme.bodySmall),
+            child: Text('HEADERS', style: Theme.of(context).textTheme.bodySmall),
           ),
           buildHeadersViewer(context, event.request!.headers.entries),
         ],
@@ -560,8 +549,7 @@ class NetworkLoggerEventScreen extends StatelessWidget {
         if (event.response?.headers.isNotEmpty ?? false) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
-            child:
-                Text('HEADERS', style: Theme.of(context).textTheme.bodySmall),
+            child: Text('HEADERS', style: Theme.of(context).textTheme.bodySmall),
           ),
           buildHeadersViewer(
             context,
@@ -612,8 +600,7 @@ class NetworkLoggerEventScreen extends StatelessWidget {
 
 /// Widget builder that re-builds widget repeatedly with [duration] interval.
 class _AutoUpdate extends StatefulWidget {
-  const _AutoUpdate({Key? key, required this.duration, required this.builder})
-      : super(key: key);
+  const _AutoUpdate({Key? key, required this.duration, required this.builder}) : super(key: key);
 
   /// Re-build interval.
   final Duration duration;
@@ -662,8 +649,7 @@ class _AutoUpdateState extends State<_AutoUpdate> {
 }
 
 class _DebugOnly extends StatelessWidget {
-  const _DebugOnly({Key? key, required this.enabled, required this.child})
-      : super(key: key);
+  const _DebugOnly({Key? key, required this.enabled, required this.child}) : super(key: key);
 
   final bool enabled;
   final Widget child;
