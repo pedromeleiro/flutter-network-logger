@@ -321,30 +321,50 @@ class NetworkLoggerScreen extends StatelessWidget {
                   itemCount: events.length,
                   itemBuilder: enumerateItems<NetworkEvent>(
                     events,
-                    (context, item) => ListTile(
+                    (context, item) => GestureDetector(
                       key: ValueKey(item.request),
-                      subtitle: RichText(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: item.request!.method,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            WidgetSpan(child: SizedBox(width: 6)),
-                            TextSpan(
-                              text: item.request!.uri,
-                            ),
-                          ],
-                        ),
-                      ),
-                      trailing: Text(
-                          "${item.timestamp!.hour.toString().padLeft(2, "0")}:${item.timestamp!.minute.toString().padLeft(2, "0")}:${item.timestamp!.second.toString().padLeft(2, "0")}.${item.timestamp!.millisecond.toString().padLeft(3, "0")}"),
                       onTap: () => NetworkLoggerEventScreen.open(
                         context,
                         item,
                         eventList,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              // request method
+                              Text(
+                                item.request!.method,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 8),
+                              // request time
+                              Text(
+                                "${item.timestamp!.hour.toString().padLeft(2, "0")}:${item.timestamp!.minute.toString().padLeft(2, "0")}:${item.timestamp!.second.toString().padLeft(2, "0")}.${item.timestamp!.millisecond.toString().padLeft(3, "0")}",
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          // request uri
+                          Text(
+                            item.request!.uri,
+                          ),
+                          // request body preview
+                          if (item.request!.data != null) ...[
+                            SizedBox(height: 4),
+                            Text(
+                              item.request!.data != null ? item.request!.data.toString() : '',
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontFamilyFallback: ['sans-serif'],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                          SizedBox(height: 12),
+                        ],
                       ),
                     ),
                   ),
